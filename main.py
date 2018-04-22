@@ -30,7 +30,22 @@ for category in brown.categories():
 average_accuracies.append(np.average(accuracies))
 
 # plot the accuracy of the taggers and their accuracies thus far on a bar chart.
-plot_bar(taggers, average_accuracies, "default-only")
+plot_bar(taggers_used, average_accuracies, "default-only")
 
 # print a pretty-printed confusion matrix for the default tagger against the news category of the brown corpus.
-print(taggers.create_confusion_matrix(brown, "news", default_tagger))
+print("\n" + taggers.create_confusion_matrix(brown, "news", default_tagger))
+
+# ============================================================
+# Regex Tagger:
+# ============================================================
+
+# this code block follows the same structure as the default tagger code block, comments can be found there.
+
+taggers_used.append("Regex")
+regex_tagger = taggers.regex_tagger()
+accuracies = []
+for category in brown.categories():
+    accuracies.append(regex_tagger.evaluate(brown.tagged_sents(categories=category)))
+average_accuracies.append(np.average(accuracies))
+plot_bar(taggers_used, average_accuracies, "regex")
+print("\n" + taggers.create_confusion_matrix(brown, "news", regex_tagger))

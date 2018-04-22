@@ -25,14 +25,14 @@ def default_tagger():
 
 def regex_tagger(backoff_tagger = None):
     patterns = [
-         (r'.*ing$', 'VBG'),               # gerunds
-         (r'.*ed$', 'VBD'),                # simple past
-         (r'.*es$', 'VBZ'),                # 3rd singular present
-         (r'.*ould$', 'MD'),               # modals
-         (r'.*\'s$', 'NN$'),               # possessive nouns
-         (r'.*s$', 'NNS'),                 # plural nouns
-         (r'^-?[0-9]+(.[0-9]+)?$', 'CD'),  # cardinal numbers
-         (r'.*', 'NN')                     # nouns (default)
+         ('.*ing$', 'VBG'),               # gerunds
+         ('.*ed$', 'VBD'),                # simple past
+         ('.*es$', 'VBZ'),                # 3rd singular present
+         ('.*ould$', 'MD'),               # modals
+         ('.*\'s$', 'NN$'),               # possessive nouns
+         ('.*s$', 'NNS'),                 # plural nouns
+         ('^-?[0-9]+(.[0-9]+)?$', 'CD'),  # cardinal numbers
+         ('.*', 'NN')                     # nouns (default)
     ]
     return nltk.RegexpTagger(patterns, backoff=backoff_tagger)
 
@@ -74,9 +74,6 @@ def evaluate_backoff_model(corpus):
     
     # evaluate the test set using our tagger backoff model.
     return t5.evaluate(test_sents)
-
-
-
 
 #brown_tagged_sents = brown.tagged_sents(categories='news')
 #brown_sents = brown.sents(categories='news')
