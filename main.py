@@ -1,25 +1,36 @@
 import nltk
 from nltk.corpus import brown
-
 import numpy as np
-import matplotlib.pyplot as plt
 
-from taggers import most_common_tag, create_confusion_matrix, evaluate
+import taggers
 from plot import plot_bar
 
-taggers = []
+taggers_used = []
 accuracies = []
 average_accuracies = []
 
 # find the most common tag used in each of the brown categories.
-most_common_tags = [most_common_tag(brown, category) for category in brown.categories()]
+most_common_tags = [taggers.most_common_tag(brown, category) for category in brown.categories()]
 
-# setup a defult tagger using noun as the default, and test it against each category in the brown corpus.
+# ============================================================
+# Default Tagger:
+# ============================================================
+
+# append the tagger name to our taggers list for plotting.
+taggers_used.append("Default")
+
+# instantiate the default tagger with the default tag as Noun.
 default_tagger = nltk.DefaultTagger('NN')
-taggers.append("Default")
+
+# evaluate the tagger against each category in the brown corpus, storing the accuracies.
 for category in brown.categories():
     accuracies.append(default_tagger.evaluate(brown.tagged_sents(categories=category)))
+    
+# get the average accuracy of the model and append this to the average_accuracies list for plotting.
 average_accuracies.append(np.average(accuracies))
-print(create_confusion_matrix(brown, "news", default_tagger))
 
+# plot the accuracy of the taggers and their accuracies thus far on a bar chart.
 plot_bar(taggers, average_accuracies, "default-only")
+
+# print a pretty-printed confusion matrix for the default tagger against the news category of the brown corpus.
+print(taggers.create_confusion_matrix(brown, "news", default_tagger))

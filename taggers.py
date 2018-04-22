@@ -23,7 +23,7 @@ def create_confusion_matrix(corpus, category, tagger):
 def default_tagger():
     return nltk.DefaultTagger('NN')
 
-def regex_tagger(backoff_tagger):
+def regex_tagger(backoff_tagger = None):
     patterns = [
          (r'.*ing$', 'VBG'),               # gerunds
          (r'.*ed$', 'VBD'),                # simple past
@@ -34,25 +34,25 @@ def regex_tagger(backoff_tagger):
          (r'^-?[0-9]+(.[0-9]+)?$', 'CD'),  # cardinal numbers
          (r'.*', 'NN')                     # nouns (default)
     ]
-    return nltk.RegexpTagger(patterns, backoff=backoff_tagger)
+    return nltk.RegexpTagger(patterns, backoff=None)
 
-def lookup_tagger(words, tagged_words, backoff_tagger):
+def lookup_tagger(words, tagged_words, backoff_tagger = None):
     fd = nltk.FreqDist(words)
     cfd = nltk.ConditionalFreqDist(tagged_words)
     most_freq_words = fd.most_common(100)
     likely_tags = dict((word, cfd[word].max()) for (word, _) in most_freq_words)
     return nltk.UnigramTagger(model=likely_tags, backoff=backoff_tagger)
 
-def unigram_tagger(train_sents, backoff_tagger):
+def unigram_tagger(train_sents, backoff_tagger = None):
     return nltk.UnigramTagger(train_sents, backoff=backoff_tagger)
 
-def bigram_tagger(train_sents, backoff_tagger):
+def bigram_tagger(train_sents, backoff_tagger = None):
     return nltk.BigramTagger(train_sents, backoff=backoff_tagger)
 
-def trigram_tagger(train_sents, backoff_tagger):
+def trigram_tagger(train_sents, backoff_tagger = None):
     return nltk.TrigramTagger(train_sents, backoff=backoff_tagger, cutoff=2)
     
-def evaluate(corpus):
+def evaluate_backoff_model(corpus):
     
     # get the words and the tagged words, used by the lookup tagger.
     words = corpus.words(categories='news')
