@@ -34,7 +34,7 @@ def regex_tagger(backoff_tagger = None):
          (r'^-?[0-9]+(.[0-9]+)?$', 'CD'),  # cardinal numbers
          (r'.*', 'NN')                     # nouns (default)
     ]
-    return nltk.RegexpTagger(patterns, backoff=None)
+    return nltk.RegexpTagger(patterns, backoff=backoff_tagger)
 
 def lookup_tagger(words, tagged_words, backoff_tagger = None):
     fd = nltk.FreqDist(words)
