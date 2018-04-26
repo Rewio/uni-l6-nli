@@ -102,11 +102,11 @@ def trigram_tagger(train_sents, backoff_tagger = None, cutoff = 0):
 def backoff_model(words, tagged_words, training_set):
     
     # define our taggers and their backoff taggers.
-    t1 = regex_tagger()
-    t2 = lookup_tagger(words, tagged_words, t1)
-    t3 = unigram_tagger(training_set, t2)
-    t4 = bigram_tagger(training_set, t3, 0)
-    t5 = trigram_tagger(training_set, t4, 4)
+    regex_backoff   = regex_tagger()
+    lookup_backoff  = lookup_tagger(words, tagged_words, regex_backoff)
+    unigram_backoff = unigram_tagger(training_set, lookup_backoff)
+    bigram_backoff  = bigram_tagger(training_set, unigram_backoff, 0)
+    complete_tagger = trigram_tagger(training_set, bigram_backoff, 4)
     
-    # evaluate the test set using our tagger backoff model.
-    return t5
+    # return the model for evaluation.
+    return complete_tagger
