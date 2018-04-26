@@ -18,7 +18,7 @@ default_accuracy = taggers.evaluate_accuracy(default_tagger)
 # ============================================================
 
 # instantiate the regex tagger then evaluate it.
-regex_tagger = taggers.regex_tagger()
+regex_tagger   = taggers.regex_tagger()
 regex_accuracy = taggers.evaluate_accuracy(regex_tagger)
 
 # ============================================================
@@ -57,3 +57,24 @@ test_set  = all_tagged_sentences[size:]
 # train the unigram tagger using the train set, then evaluate it against the test set.
 unigram_tagger   = taggers.unigram_tagger(train_set, default_tagger)
 unigram_accuracy = taggers.evaluate_accuracy(unigram_tagger, test_set)
+
+# ============================================================
+# Bigram Tagger:
+# ============================================================
+
+bigram_tagger   = taggers.bigram_tagger(train_set, default_tagger, 0)
+bigram_accuracy = taggers.evaluate_accuracy(bigram_tagger, test_set)
+
+# ============================================================
+# Trigram Tagger:
+# ============================================================
+
+trigram_tagger   = taggers.trigram_tagger(train_set, default_tagger, 0)
+trigram_accuracy = taggers.evaluate_accuracy(trigram_tagger, test_set)
+
+# ============================================================
+# Backoff Model:
+# ============================================================
+
+backoff_model    = taggers.backoff_model(all_words, all_tagged_words, train_set)
+backoff_accuracy = taggers.evaluate_accuracy(backoff_model, test_set)
