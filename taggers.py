@@ -1,4 +1,6 @@
 import nltk
+from nltk.corpus import brown
+import numpy as np
 
 def most_common_tag(corpus, category):
     tags = [tag for (word, tag) in corpus.tagged_words(categories=category, tagset='universal')]
@@ -19,6 +21,23 @@ def create_confusion_matrix(corpus, category, tagger):
     # create the confusion matrix and return it in a pretty-printed format.
     cm = nltk.ConfusionMatrix(gold, test)
     return cm.pretty_format(sort_by_count=True, show_percents=True, truncate=10)
+
+def evaluate_accuracy(tagger, test_set = None):
+    
+    # container for our accuracies across the brown categories.
+    accuracies = []
+
+    # if a test set is specified, evaluate the tagger against that.
+    if (test_set):
+        return tagger.evaluate(test_set)
+    
+    # otherwise, evaluate the tagger against the brown corpus.
+    else:
+        for category in brown.categories():
+            accuracies.append(tagger.evaluate(brown.tagged_sents(categories=category)))
+
+    # return the average accuracy.
+    return np.average(accuracies)
 
 def default_tagger():
     return nltk.DefaultTagger('NN')
