@@ -55,9 +55,13 @@ def plot(x, y, save_name):
     ax.grid(which='minor', alpha=0.15)
     ax.grid(which='major', alpha=0.3)
     
+    plt.xlabel("Size of Training Data Provided")
+    plt.ylabel("Accuracy Achieved")
+    plt.title("Unigram Accuracy Given Varying Training Sizes")
+    
     # plot the data, ensuring the ytick is setup with a decent step size.
     plt.plot(x, y, ":ro")
-    plt.grid(True, drawstyle="steps")
+    plt.grid(True)
     plt.yticks(np.arange(0, 1.1, 0.1))
     
     # save the plotting to a local file.

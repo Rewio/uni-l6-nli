@@ -96,10 +96,20 @@ cm = taggers.create_confusion_matrix(brown, "news", backoff_model)
 # Task 2:
 # ============================================================
 
+# declare the sizes we wish to use when training, and the container with which we will record their accuracies.
 sizes = 2 ** np.arange(16)
 accuracies = []
+
+# iterate over each of the sizes...
 for size in sizes:
-    model = taggers.backoff_model(all_words, all_tagged_words, all_tagged_sentences[:size], size)
-    accuracies.append(taggers.evaluate_accuracy(model, all_tagged_sentences[size:]))
     
-plot.plot(sizes[:-1], accuracies[:-1], "task-2")
+    # declare the training and testing set, based on this iterations size.
+    training_set = all_tagged_sentences[:size]
+    testing_set  = all_tagged_sentences[size:]
+    
+    # train our model using the training set, then evaluate it against the test set.
+    model = taggers.unigram_tagger(training_set, default_tagger)
+    accuracies.append(taggers.evaluate_accuracy(model, testing_set))
+    
+# finally plot the accuracies against the sizes using a standard line graph.
+plot.plot(sizes, accuracies, "task-2")
