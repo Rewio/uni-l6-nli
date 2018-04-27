@@ -1,5 +1,6 @@
 import nltk
 from nltk.corpus import brown
+from nltk.metrics import precision, recall, f_measure
 import numpy as np
 
 def most_common_tag(corpus, category):
@@ -20,7 +21,16 @@ def create_confusion_matrix(corpus, category, tagger):
     
     # create the confusion matrix and return it in a pretty-printed format.
     cm = nltk.ConfusionMatrix(gold, test)
-    return cm.pretty_format(sort_by_count=True, show_percents=True, truncate=10)
+    return cm.pretty_format(sort_by_count=True, show_percents=True, truncate=20)
+
+def evaluate_precision_recall_fmeasure(corpus, category, tagger):
+    
+    # get a list of the gold standard tags, and the tags set by the tagger.
+    gold = set(tag_list(corpus.tagged_sents(categories=category)))
+    test = set(tag_list(apply_tagger(tagger, corpus.tagged_sents(categories=category))))
+    
+    # return the precision and recall of the evaluated model.
+    return [precision(gold, test), recall(gold, test), f_measure(gold, test)]
 
 def evaluate_accuracy(tagger, test_set = None):
 
@@ -33,9 +43,6 @@ def evaluate_accuracy(tagger, test_set = None):
         accuracies = []
         for category in brown.categories():
             accuracies.append(tagger.evaluate(brown.tagged_sents(categories=category)))
-
-    for accuracy in accuracies:
-        print(accuracy)
 
     # return the average accuracy.
     return np.average(accuracies)
@@ -83,10 +90,15 @@ def regex_tagger():
     ]
     return nltk.RegexpTagger(patterns, backoff = default_tagger())
 
-def lookup_tagger(words, tagged_words, backoff_tagger = None):
+def lookup_tagger(words, tagged_words, backoff_tagger = None, num_most_common = None):
+    
+    if not num_most_common:
+        num_most_common = 57340
+    
     fd = nltk.FreqDist(words)
     cfd = nltk.ConditionalFreqDist(tagged_words)
-    most_freq_words = fd.most_common(57340)
+    
+    most_freq_words = fd.most_common(num_most_common)
     likely_tags = dict((word, cfd[word].max()) for (word, _) in most_freq_words)
     return nltk.UnigramTagger(model=likely_tags, backoff=backoff_tagger)
 
@@ -99,11 +111,11 @@ def bigram_tagger(train_sents, backoff_tagger = None, cutoff = 0):
 def trigram_tagger(train_sents, backoff_tagger = None, cutoff = 0):
     return nltk.TrigramTagger(train_sents, backoff = backoff_tagger, cutoff = cutoff)
     
-def backoff_model(words, tagged_words, training_set):
+def backoff_model(words, tagged_words, training_set, num_most_common = None):
     
     # define our taggers and their backoff taggers.
     regex_backoff   = regex_tagger()
-    lookup_backoff  = lookup_tagger(words, tagged_words, regex_backoff)
+    lookup_backoff  = lookup_tagger(words, tagged_words, regex_backoff, num_most_common)
     unigram_backoff = unigram_tagger(training_set, lookup_backoff)
     bigram_backoff  = bigram_tagger(training_set, unigram_backoff, 0)
     complete_tagger = trigram_tagger(training_set, bigram_backoff, 4)

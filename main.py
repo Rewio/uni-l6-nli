@@ -1,6 +1,8 @@
 import nltk
+import numpy as np
 from nltk.corpus import brown
 import taggers
+import plot
 
 # find the most common tag used in each of the brown categories.
 most_common_tags = [taggers.most_common_tag(brown, category) for category in brown.categories()]
@@ -36,7 +38,7 @@ for category in brown.categories():
         all_tagged_words.append(tagged_word)
 
 # train the lookup tagger and evaluate it's accuracy.
-lookup_tagger   = taggers.lookup_tagger(all_words, all_tagged_words, default_tagger)
+lookup_tagger   = taggers.lookup_tagger(all_words, all_tagged_words, default_tagger, 2000)
 lookup_accuracy = taggers.evaluate_accuracy(lookup_tagger)
 
 # ============================================================
@@ -78,3 +80,26 @@ trigram_accuracy = taggers.evaluate_accuracy(trigram_tagger, test_set)
 
 backoff_model    = taggers.backoff_model(all_words, all_tagged_words, train_set)
 backoff_accuracy = taggers.evaluate_accuracy(backoff_model, test_set)
+
+# ============================================================
+# Plotting and Metrics:
+# ============================================================
+
+plot.plot_bar(["Default", "Regex", "Lookup", "Unigram", "Bigram", "Trigram", "Backoff"],
+              [default_accuracy, regex_accuracy, lookup_accuracy, unigram_accuracy,
+               bigram_accuracy, trigram_accuracy, backoff_accuracy], "all-taggers")
+    
+prec_rec_f1 = taggers.evaluate_precision_recall_fmeasure(brown, "news", backoff_model)
+cm = taggers.create_confusion_matrix(brown, "news", backoff_model)
+
+# ============================================================
+# Task 2:
+# ============================================================
+
+sizes = 2 ** np.arange(16)
+accuracies = []
+for size in sizes:
+    model = taggers.backoff_model(all_words, all_tagged_words, all_tagged_sentences[:size], size)
+    accuracies.append(taggers.evaluate_accuracy(model, all_tagged_sentences[size:]))
+    
+plot.plot(sizes[:-1], accuracies[:-1], "task-2")
